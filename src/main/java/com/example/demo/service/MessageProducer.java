@@ -31,28 +31,22 @@ public class MessageProducer {
     @Autowired
     private TransactionRepo  transactionRepo;
 
-    int messageNumber = 1;
+    ExecutorService senderThread = Executors.newFixedThreadPool(10);
 
     //for demo purpose sending messages at 5 sec interval
     @Scheduled(fixedRate = 5000)
     public void sendMessage() {
 
-        ExecutorService senderThread = Executors.newFixedThreadPool(10);
         List<Transaction> transactionData =  transactionRepo.findAll();
-        transactionData.stream().forEach(s -> System.out.println(s.toString()));
-        System.out.println("Records in DB : "+transactionData.size());
+        transactionData.stream().forEach((Transaction s) -> {
+            senderThread.execute(new Runnable() {
+                @Override
+                public void run() {
 
-        //Below commented lines should be kept under list iteration with message Transaction obj as Json string
-        /*senderThread.execute(new Runnable() {
-            @Override
-            public void run() {
-                rabbitTemplate.convertAndSend(topicExchange.getName(), routingKey, "---- Test Message " + ++messageNumber);
-                System.out.println("Published message : " + "---- Test Message " + messageNumber);
-            }
-        });*/
-
-        //For testing queues message transmission purpose use below code
-        rabbitTemplate.convertAndSend(topicExchange.getName(), routingKey, "---- Test Message " + ++messageNumber);
-        System.out.println("Published message : " + "---- Test Message " + messageNumber);
+                    System.out.println("Publishing message : " + s);
+                    rabbitTemplate.convertAndSend(topicExchange.getName(), routingKey, s.toString());
+                }
+            });
+        });
     }
 }

@@ -1,38 +1,50 @@
+
 package com.example.demo.entity;
 
 import javax.persistence.*;
-import java.sql.Clob;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "TRANSACTION")
-public class Transaction {
+public class Transaction implements Serializable{
+
+    public Transaction(){
+    }
+
+    public Transaction(int transactionId, int transactionMessageId, String transactionStatus, String payload){
+
+        this.transactionId = transactionId;
+        this.transactionMessageId = transactionMessageId;
+        this.transactionStatus = transactionStatus;
+        this.payload = payload;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long transactionId;
+    private Integer transactionId;
 
     @Column(name = "TRAN_MESSAGE_ID")
-    private Long transactionMessageId;
+    private Integer transactionMessageId;
 
     @Column(name = "TRAN_STATUS")
     private String transactionStatus;
 
     @Column(name = "PAYLOAD")
-    private Clob payload;
+    private String payload;
 
-    public Long getTransactionId() {
+    public int getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(Long transactionId) {
+    public void setTransactionId(int transactionId) {
         this.transactionId = transactionId;
     }
 
-    public Long getTransactionMessageId() {
+    public int getTransactionMessageId() {
         return transactionMessageId;
     }
 
-    public void setTransactionMessageId(Long transactionMessageId) {
+    public void setTransactionMessageId(int transactionMessageId) {
         this.transactionMessageId = transactionMessageId;
     }
 
@@ -44,17 +56,23 @@ public class Transaction {
         this.transactionStatus = transactionStatus;
     }
 
-    public Clob getPayload() {
+    public String getPayload() {
         return payload;
     }
 
-    public void setPayload(Clob payload) {
+    public void setPayload(String payload) {
         this.payload = payload;
     }
 
     @Override
     public String toString(){
-        String jsonData = "{ transactionId : "+ transactionId + ", transactionStatus : "  + transactionStatus + " }";
+        String jsonData = "Transaction{" +
+                "transactionId='" + this.transactionId +
+                ", transactionMessageId=" + this.transactionMessageId +
+                ", transactionStatus='" + this.transactionStatus + '\'' +
+                ", payload='" + this.payload + '\'' +
+                '}';
+
         return jsonData;
     }
 }
