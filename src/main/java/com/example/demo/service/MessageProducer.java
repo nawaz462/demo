@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.entity.Transaction;
 import com.example.demo.repopsitory.TransactionRepo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ public class MessageProducer {
     ExecutorService senderThread = Executors.newFixedThreadPool(10);
 
     //for demo purpose sending messages at 5 sec interval
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 5000 * 60)
     public void sendMessage() {
 
         List<Transaction> transactionData =  transactionRepo.findAll();
@@ -42,9 +44,15 @@ public class MessageProducer {
             senderThread.execute(new Runnable() {
                 @Override
                 public void run() {
-
-                    System.out.println("Publishing message : " + s);
-                    rabbitTemplate.convertAndSend(topicExchange.getName(), routingKey, s.toString());
+                    ObjectMapper mapperObj = new ObjectMapper();
+                    String jsonStr = null;
+                    try {
+                        jsonStr = mapperObj.writeValueAsString(s);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("Published JSON String :: " + jsonStr);
+                    rabbitTemplate.convertAndSend(topicExchange.getName(), routingKey, jsonStr);
                 }
             });
         });

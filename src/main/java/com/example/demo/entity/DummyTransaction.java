@@ -5,13 +5,20 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "TRANSACTION", schema = "nawaz")
-public class Transaction implements Serializable{
+@Table(name = "DUMMY_TRANSACTION", schema = "nawaz")
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(name = "DUMMY_PROC",
+                procedureName = "DUMMY_PROC",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN, name = "TRANSACT_ID", type = Integer.class)
+                })
+})
+public class DummyTransaction implements Serializable{
 
-    public Transaction(){
+    public DummyTransaction(){
     }
 
-    public Transaction(int transactionId, int transactionMessageId, String transactionStatus, String payload){
+    public DummyTransaction(int transactionId, int transactionMessageId, String transactionStatus, String payload){
 
         this.transactionId = transactionId;
         this.transactionMessageId = transactionMessageId;
